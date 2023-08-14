@@ -1,0 +1,28 @@
+body {
+    background-color: rgb(253, 244, 188);
+}
+div.main-container {
+    width: 80%;
+    margin: auto;
+}
+
+.testcase-btn {
+    margin-right: 20px;
+}
+
+div.response-container {
+    margin-top: 30px;
+    width: 80%;
+    height: 80vh;
+    overflow-y: auto; 
+    overflow-x: auto;   
+    background-color: rgb(26, 26, 26);
+    border-radius: 20px;
+}
+
+div.response-container p {
+    font-size: 24px;
+    color: rgb(212, 212, 212);
+    padding: 20px;
+    overflow-wrap: break-word;
+}
