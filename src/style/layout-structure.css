@@ -2,8 +2,9 @@ body {
     background-color: rgb(253, 244, 188);
 }
 div.main-container {
+    margin-top: 40px;
     width: 80%;
-    margin: auto;
+    margin-inline: auto;
 }
 
 .testcase-btn {
