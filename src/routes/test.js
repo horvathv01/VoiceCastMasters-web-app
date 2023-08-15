@@ -6,61 +6,15 @@ import Button from 'react-bootstrap/Button';
 
 
 async function runTest(setRes, path){
-    //const res = await fetch("http://localhost:5050/api" + path)
-    const res1 = [{
-        "border": "{{int(1, 5)}}px {{random(solid, dotted, dashed)}} {{color()}}",
-        "coordinates": {
-          "type": "array",
-          "count": 2,
-          "items": "{{float(0, 120, 5)}}"
-        },
-        "password": "xX{{animal()}}-{{string(6, 10, *)}}"
-      },
+    fetch("http://localhost:5186" + path, {})
+    .then(data => data.text())
+    .then(info => {
+      console.log(info);
+    setRes(`Response of ${path}:\n${JSON.stringify(info, null, 4)}`)
+    })
       
-      {
-        "border": "3px dashed turquoise",
-        "coordinates": [
-          11.55503,
-          73.2287
-        ],
-        "password": "xXcaterpillar-********"
-      },{
-        "border": "{{int(1, 5)}}px {{random(solid, dotted, dashed)}} {{color()}}",
-        "coordinates": {
-          "type": "array",
-          "count": 2,
-          "items": "{{float(0, 120, 5)}}"
-        },
-        "password": "xX{{animal()}}-{{string(6, 10, *)}}"
-      },
-      
-      {
-        "border": "3px dashed turquoise",
-        "coordinates": [
-          11.55503,
-          73.2287
-        ],
-        "password": "xXcaterpillar-********"
-      },
-      {
-        "border": "{{int(1, 5)}}px {{random(solid, dotted, dashed)}} {{color()}}",
-        "coordinates": {
-          "type": "array",
-          "count": 2,
-          "items": "{{float(0, 120, 5)}}"
-        },
-        "password": "xX{{animal()}}-{{string(6, 10, *)}}"
-      },
-      
-      {
-        "border": "3px dashed turquoise",
-        "coordinates": [
-          11.55503,
-          73.2287
-        ],
-        "password": "xXcaterpillar-********"
-      }];
-    setRes(`Response of ${path}:\n${JSON.stringify(res1, null, 4)}`) 
+    
+    
 }
 
 function Tester() {
@@ -80,6 +34,7 @@ function Tester() {
                 <Tab eventKey="group1" title="Group 1">
                     <Button className="testcase-btn" variant="warning" onClick={() => setResponse("This is the response of case 1")}>Run case 1</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/case/2")}>Run case 2</Button>{ }
+                    <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/test/firstTest")}>Run case 2,5</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => setResponse("This is the response of case 3")}>Run case 3</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => setResponse("This is the response of case 4")}>Run case 4</Button>{ }
                     <div class="response-container"><p><pre>{testResponse}</pre></p></div>
