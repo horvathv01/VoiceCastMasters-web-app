@@ -15,15 +15,20 @@ div.response-container {
     margin-top: 30px;
     width: 80%;
     height: 80vh;
-    overflow-y: auto; 
-    overflow-x: auto;   
+    overflow-y: auto;
     background-color: rgb(26, 26, 26);
     border-radius: 20px;
 }
 
 div.response-container pre {
+    width: 100%;
+    height: 100%;
     font-size: 24px;
     color: rgb(212, 212, 212);
     padding: 20px;
     overflow-wrap: break-word;
+}
+
+div.response-container::-webkit-scrollbar {
+    display: none;
 }
