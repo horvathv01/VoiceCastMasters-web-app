@@ -6,9 +6,23 @@ import Button from 'react-bootstrap/Button';
 
 
 async function runTest(setRes, path, requestMethod){
-        //if (method == "PUT")
+    let actor = {
+        id: 10,
+        name: "Test Actress", 
+        birthDate: "1995-09-24", 
+        email: "something@test.com",
+        password: "fooBar123",
+        phone: "06301234567"
+    }
+    console.log(JSON.stringify(actor));
+    let isUpdate = false;
+    requestMethod === "PUT" ? isUpdate = true : isUpdate = false; 
     fetch("http://localhost:5186" + path, {
-        method: requestMethod
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: requestMethod,
+        body: isUpdate ? JSON.stringify(actor) : undefined
     })
     .then(data => {
         const contentType = data.headers.get("Content-Type");
@@ -38,7 +52,7 @@ function Tester() {
                 <Tab eventKey="group1" title="Actors">
                     <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users/actors", "GET")}>Get all actors</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users?userid=1", "GET")}>Get an actor by ID</Button>{ }
-                    <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users/actor/update", "PUT")}>Update an actor</Button>{ }
+                    <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users/actor/update?userid=1", "PUT")}>Update an actor</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users/delete?userid=10", "DELETE")}>Delete an actor</Button>{ }
                     <Button className="testcase-btn" variant="warning" onClick={() => runTest(setResponse, "/users?userid=10", "GET")}>Try to get the deleted actor</Button>{ }
                     <div className="response-container"><pre>{testResponse}</pre></div>
