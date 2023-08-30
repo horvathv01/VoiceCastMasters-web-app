@@ -57,11 +57,11 @@ async function accessTest(setRes, path, method, formData) {
     }
 
     const user = {
-        email: email,
-        password: password,
-        name: name,
-        birthdate: birthdate,
-        phone: phone
+        Email: email,
+        Password: password,
+        Name: name,
+        Birthdate: birthdate,
+        Phone: phone
     };
     console.log(user)
 
