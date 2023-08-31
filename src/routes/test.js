@@ -29,33 +29,74 @@ async function runTest(setRes, path, requestMethod) {
         method: requestMethod,
         body: isUpdate ? JSON.stringify(actor) : undefined
     })
-        .then(data => {
-            const contentType = data.headers.get("Content-Type");
-            if (contentType.includes("application/json")) {
-                return data.json();
-            } else if (contentType.includes("text/plain")) {
-                return data.text();
-            }
-        })
+        .then(data => handleData(data))
         .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function accessTest(setRes, path, method, formData) {
+async function TestLogin(setRes, user){
+    console.log(user);
+    await fetch("http://localhost:5186/access/login", {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": btoa(`${user.Email}:${user.Password}`),
+        },
+        method: "POST",
+        credentials: "include",
+    })
+    .then(data => handleData(data))
+    .then(result => setRes(JSON.stringify(result, null, 2)))
+}
+
+async function TestCookie(setRes){
+    fetch("http://localhost:5186/access/test", {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "GET",
+                credentials: "include"
+            })
+    .then(data => handleData(data))
+    .then(result => setRes(JSON.stringify(result, null, 2)))
+}
+
+async function TestLogout(setRes){
+    await fetch("http://localhost:5186/access/logout", {
+        method: "POST",
+        credentials: "include"
+    })
+    .then(data => handleData(data))
+    .then(result => setRes(JSON.stringify(result, null, 2)))
+}
+
+async function TestRegistration(setRes, user){
+    await fetch("http://localhost:5186/access/registration", {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(user)
+    })
+    .then(data => handleData(data))
+    .then(result => setRes(JSON.stringify(result, null, 2)))
+}
+
+async function handleData(data){
+        const contentType = data.headers.get("Content-Type");
+        if (contentType.includes("application/json")) {
+            return data.json();
+        } else if (contentType.includes("text/plain")) {
+            return data.text();
+        }
+}
+
+async function accessTest(setRes, method, formData) {
     const email = formData.formEmail;
     const password = formData.formPassword;
-    let name;
-    let birthdate;
-    let phone;
+    const name  = formData.formName;
+    const birthdate = new Date(formData.formBirthdate);
+    const phone = formData.formPhone;
     
-    let isLogin = false;
-    let isLoginSuccessful = false;
-    if (method === "LOGIN") isLogin = true;
-    else {
-        name  = formData.formName;
-        birthdate = new Date(formData.formBirthdate);
-        phone = formData.formPhone;
-    }
-
     const user = {
         Email: email,
         Password: password,
@@ -68,29 +109,23 @@ async function accessTest(setRes, path, method, formData) {
         Role: "Actor"
     };
 
-    fetch("http://localhost:5186" + path, {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": isLogin ? `${email}:${password}` : '',
-        },
-        method: "POST",
-        credentials: "include",
-        body: isLogin ? undefined : JSON.stringify(user)
-    })
-        .then(data => {
-            const contentType = data.headers.get("Content-Type");
-            console.log(data.ok)
-            if(isLogin && data.ok) isLoginSuccessful = true;
-            if (contentType.includes("application/json")) {
-                return data.json();
-            } else if (contentType.includes("text/plain")) {
-                return data.text();
-            }
-        })
-        .then(result => setRes(JSON.stringify(result, null, 2)))
-        
-        if (isLoginSuccessful) window.location.href = "/logintest"
-
+    switch (method) {
+        case "LOGIN":
+            TestLogin(setRes, user)
+            break;
+        case "LOGOUT":
+            TestLogout(setRes)
+            break;
+        case "REGISTRATION":
+            TestRegistration(setRes, user)
+            break;
+        case "TRYVISIT":
+            TestCookie(setRes)
+            break;
+        default:
+            console.error("Please provide a valid method!");
+            break;
+    }
 }
 
 function Tester() {
@@ -104,9 +139,9 @@ function Tester() {
     const [testResponse, setResponse] = useState("Hit 'Run' to see response");
     const [startDate, setStartDate] = useState(new Date(demoForm["formBirthdate"]));
     const [formData, setFormData] = useState(demoForm);
-    const handleSubmit = (event, path, method) => {
+    const handleSubmit = (event, method) => {
         event.preventDefault();
-        accessTest(setResponse, path, method, formData)
+        accessTest(setResponse, method, formData)
     };
     const handleChange = (e) => {
         setFormData({
@@ -142,7 +177,7 @@ function Tester() {
                     <div className="response-container"><pre>{testResponse}</pre></div>
                 </Tab>
                 <Tab eventKey="group3" title="Register">
-                    <Form onSubmit={(e) => handleSubmit(e, "/access/registration", "REGISTER")}>
+                    <Form onSubmit={(e) => handleSubmit(e, "REGISTRATION")}>
                         <Form.Group as={Row} className="mb-3" controlId="formEmail" name="formEmail">
                             <Form.Label column sm="2">
                                 Email
@@ -189,7 +224,7 @@ function Tester() {
                     <div className="response-container"><pre>{testResponse}</pre></div>
                 </Tab>
                 <Tab eventKey="group4" title="Login">
-                    <Form onSubmit={(e) => handleSubmit(e, "/access/login", "LOGIN")}>
+                    <Form onSubmit={(e) => handleSubmit(e, "LOGIN")}>
                         <Form.Group as={Row} className="mb-3" controlId="formEmail" name="formEmail">
                             <Form.Label column sm="2">
                                 Email
@@ -206,8 +241,11 @@ function Tester() {
                                 <Form.Control type="password" placeholder="Password" onChange={handleChange}/>
                             </Col>
                         </Form.Group>
-                        <Button type="submit" className="testcase-btn" variant="warning">Log in</Button>{ }
+                        <Button type="submit" className="testcase-btn" variant="warning" /*onClick={() => accessTest(setResponse, "LOGIN", formData)}*/>Log in</Button>{ }
+                        
                     </Form>
+                    <Button type="button" className="testcase-btn" variant="warning" onClick={() => accessTest(setResponse, "TRYVISIT", formData)}>Try visit</Button>{ }
+                    <Button type="button" className="testcase-btn" variant="warning" onClick={() => accessTest(setResponse, "LOGOUT", formData)}>Log out</Button>{ }
                     <div className="response-container"><pre>{testResponse}</pre></div>
                 </Tab>
             </Tabs>
