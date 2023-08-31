@@ -46,9 +46,9 @@ async function accessTest(setRes, path, method, formData) {
     let name;
     let birthdate;
     let phone;
-
     
     let isLogin = false;
+    let isLoginSuccessful = false;
     if (method === "LOGIN") isLogin = true;
     else {
         name  = formData.formName;
@@ -76,6 +76,8 @@ async function accessTest(setRes, path, method, formData) {
     })
         .then(data => {
             const contentType = data.headers.get("Content-Type");
+            console.log(data.ok)
+            if(isLogin && data.ok) isLoginSuccessful = true;
             if (contentType.includes("application/json")) {
                 return data.json();
             } else if (contentType.includes("text/plain")) {
@@ -83,6 +85,8 @@ async function accessTest(setRes, path, method, formData) {
             }
         })
         .then(result => setRes(JSON.stringify(result, null, 2)))
+        
+        if (isLoginSuccessful) window.location.href = "/logintest"
 
 }
 
