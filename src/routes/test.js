@@ -52,7 +52,7 @@ async function accessTest(setRes, path, method, formData) {
     if (method === "LOGIN") isLogin = true;
     else {
         name  = formData.formName;
-        birthdate = formData.formBirthdate;
+        birthdate = new Date(formData.formBirthdate);
         phone = formData.formPhone;
     }
 
@@ -60,18 +60,21 @@ async function accessTest(setRes, path, method, formData) {
         Email: email,
         Password: password,
         Name: name,
-        Birthdate: birthdate,
-        Phone: phone
+        BirthDate: `${birthdate.getFullYear()}-${(birthdate.getMonth() + 1).toString().padStart(2, "0")}-${birthdate.getDate().toString().padStart(2, "0")}`,
+        ProfilePicture: "https://static.agroinform.hu/data/cikk/5/649/cikk_50649/csirke.jpg",
+        Relations: {},
+        SampleURL: ["https://static.agroinform.hu/data/cikk/5/649/cikk_50649/csirke.jpg"],
+        Phone: phone,
+        Role: "Actor"
     };
-    console.log(user)
 
     fetch("http://localhost:5186" + path, {
         headers: {
             "Content-Type": "application/json",
-            "Authorization": isLogin ? `${email}:${password}` : ''
+            "Authorization": isLogin ? `${email}:${password}` : '',
         },
         method: "POST",
-        
+        credentials: "include",
         body: isLogin ? undefined : JSON.stringify(user)
     })
         .then(data => {
