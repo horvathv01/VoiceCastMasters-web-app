@@ -29,11 +29,11 @@ async function runTest(setRes, path, requestMethod) {
         method: requestMethod,
         body: isUpdate ? JSON.stringify(actor) : undefined
     })
-        .then(data => handleData(data))
+        .then(data => handleData(data, setRes))
         .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function TestLogin(setRes, user){
+async function TestLogin(setRes, user) {
     console.log(user);
     await fetch("http://localhost:5186/access/login", {
         headers: {
@@ -43,32 +43,32 @@ async function TestLogin(setRes, user){
         method: "POST",
         credentials: "include",
     })
-    .then(data => handleData(data))
-    .then(result => setRes(JSON.stringify(result, null, 2)))
+        .then(data => handleData(data, setRes))
+        .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function TestCookie(setRes){
+async function TestCookie(setRes) {
     fetch("http://localhost:5186/access/test", {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                method: "GET",
-                credentials: "include"
-            })
-    .then(data => handleData(data))
-    .then(result => setRes(JSON.stringify(result, null, 2)))
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "GET",
+        credentials: "include"
+    })
+        .then(data => handleData(data, setRes))
+        .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function TestLogout(setRes){
+async function TestLogout(setRes) {
     await fetch("http://localhost:5186/access/logout", {
         method: "POST",
         credentials: "include"
     })
-    .then(data => handleData(data))
-    .then(result => setRes(JSON.stringify(result, null, 2)))
+        .then(data => handleData(data, setRes))
+        .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function TestRegistration(setRes, user){
+async function TestRegistration(setRes, user) {
     await fetch("http://localhost:5186/access/registration", {
         headers: {
             "Content-Type": "application/json",
@@ -77,26 +77,31 @@ async function TestRegistration(setRes, user){
         credentials: "include",
         body: JSON.stringify(user)
     })
-    .then(data => handleData(data))
-    .then(result => setRes(JSON.stringify(result, null, 2)))
+        .then(data => handleData(data, setRes))
+        .then(result => setRes(JSON.stringify(result, null, 2)))
 }
 
-async function handleData(data){
+async function handleData(data, setRes) {
+    try {
         const contentType = data.headers.get("Content-Type");
         if (contentType.includes("application/json")) {
             return data.json();
         } else if (contentType.includes("text/plain")) {
             return data.text();
         }
+    } catch (error) {
+        setRes(error + "\nProbably no user is logged in")
+    }
+
 }
 
 async function accessTest(setRes, method, formData) {
     const email = formData.formEmail;
     const password = formData.formPassword;
-    const name  = formData.formName;
+    const name = formData.formName;
     const birthdate = new Date(formData.formBirthdate);
     const phone = formData.formPhone;
-    
+
     const user = {
         Email: email,
         Password: password,
@@ -158,6 +163,7 @@ function Tester() {
                 onSelect={(k) => {
                     setKey(k);
                     setResponse("Hit 'Run' to see response");
+                    formData.formPassword = "";
                 }}
                 className="mb-3"
             >
@@ -183,7 +189,7 @@ function Tester() {
                                 Email
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="email" defaultValue={formData["formEmail"]} onChange={handleChange}/>
+                                <Form.Control type="email" defaultValue={formData["formEmail"]} onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3" controlId="formName" name="formName">
@@ -191,7 +197,7 @@ function Tester() {
                                 Name
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control defaultValue={formData["formName"]} onChange={handleChange}/>
+                                <Form.Control defaultValue={formData["formName"]} onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3" controlId="formPhone" name="formPhone">
@@ -199,7 +205,7 @@ function Tester() {
                                 Phone number
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control defaultValue={formData["formPhone"]} onChange={handleChange}/>
+                                <Form.Control defaultValue={formData["formPhone"]} onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3" controlId="formBirthdate" name="formBirthdate">
@@ -207,7 +213,7 @@ function Tester() {
                                 Birthdate
                             </Form.Label>
                             <Col sm="10">
-                                <DatePicker selected={startDate} onChange={(date) => setStartDate(date)}/>
+                                <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3" controlId="formPassword" name="formPassword">
@@ -215,7 +221,7 @@ function Tester() {
                                 Password
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="password" placeholder="Password" onChange={handleChange}/>
+                                <Form.Control type="password" placeholder="Password" onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Button type='submit' className="testcase-btn" variant="warning">Register</Button>{ }
@@ -230,7 +236,7 @@ function Tester() {
                                 Email
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="email" defaultValue={formData["formEmail"]} onChange={handleChange}/>
+                                <Form.Control type="email" defaultValue={formData["formEmail"]} onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Form.Group as={Row} className="mb-3" controlId="formPassword" name="formPassword">
@@ -238,11 +244,11 @@ function Tester() {
                                 Password
                             </Form.Label>
                             <Col sm="10">
-                                <Form.Control type="password" placeholder="Password" onChange={handleChange}/>
+                                <Form.Control type="password" placeholder="Password" onChange={handleChange} />
                             </Col>
                         </Form.Group>
                         <Button type="submit" className="testcase-btn" variant="warning" /*onClick={() => accessTest(setResponse, "LOGIN", formData)}*/>Log in</Button>{ }
-                        
+
                     </Form>
                     <Button type="button" className="testcase-btn" variant="warning" onClick={() => accessTest(setResponse, "TRYVISIT", formData)}>Try visit</Button>{ }
                     <Button type="button" className="testcase-btn" variant="warning" onClick={() => accessTest(setResponse, "LOGOUT", formData)}>Log out</Button>{ }
